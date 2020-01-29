@@ -1,3 +1,1 @@
-# Attendance-APP
-
-#Contributors: Hasham Reyaz
+# Attendance-Management-System
