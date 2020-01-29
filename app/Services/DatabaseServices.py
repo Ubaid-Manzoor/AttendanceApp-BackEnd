@@ -1,7 +1,16 @@
 #CRUD Related Services
 from app import db
+from app.Collections.Courses import Courses 
 
 class DatabaseServices():
+
+    @staticmethod
+    def initiate_database():
+        ##Create Courses Collection
+        Courses.create()
+
+        ##Create Attendance Collection
+        
 
     @staticmethod
     def get_all_students_enrolled(course_name:str):
@@ -11,6 +20,7 @@ class DatabaseServices():
     @staticmethod
     def get_encodings(class_name):
         pass 
+
 
     @staticmethod
     def add_course(course_name:str):
@@ -29,11 +39,9 @@ class DatabaseServices():
 
     @staticmethod
     def mark_present(student_roll):
-         = db['attendence']
+        pass 
 
     @staticmethod
     def mark_absent(student_roll):
-        pass
+        result: int
 
-
-DatabaseServices.get_all_students_enrolled("math1")

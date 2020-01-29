@@ -41,10 +41,11 @@ def initiate_attendence():
 
             if matches[best_match_index]:
                 print(all_student_roll_nos[best_match_index])
-                mark_present(all_student_roll_nos[best_match_index])
+                print("mark_present")
+                # mark_present(all_student_roll_nos[best_match_index])
             else:
-                mark_absent(all_student_roll_nos[best_match_index])
-                print("No Match")
+                # mark_absent(all_student_roll_nos[best_match_index])
+                print("mark_absent")
         return "Done"
 
 
