@@ -1,5 +1,7 @@
 from app import db
 from pymongo import errors
+from collections import OrderedDict
+
 
 class Courses:
     @staticmethod
@@ -19,7 +21,7 @@ class Courses:
                         "description": "student_enrolled must be an array and is required",
                         "items":{
                             "bsonType": "object",
-                            "required": ["name","roll","encoding"],
+                            "required": ["name","roll_no","encoding"],
                             "properties":{
                                 "name": {
                                     "bsonType": "string",
@@ -40,13 +42,14 @@ class Courses:
             }                
         }
         try:
-            db.command({
+            db.command(OrderedDict({
                 "create":"courses",
                 "validator": query,
                 "validationLevel": "strict",
                 "validationAction": "error"
-            })
+            }))
             print("Collection Created!!!")
+            
         except errors.OperationFailure:
             print("Collection Already Exists!!!")
 
