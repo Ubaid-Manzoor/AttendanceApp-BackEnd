@@ -71,3 +71,7 @@ class DatabaseServices():
     def mark_absent(student_roll):
         pass
 
+
+    @staticmethod
+    def user_exits(username, password):
+        return True

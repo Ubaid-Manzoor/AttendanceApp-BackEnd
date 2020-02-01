@@ -5,6 +5,7 @@ import pymongo
 import numpy as np
 import json
 import random
+import jwt
 from app.helpers.data_helper import extract_json, generate_student_encoding, get_student_encoding, get_student_names 
 from app.helpers.image_helper import generate_image_encoding
 from app.Services.DatabaseServices import DatabaseServices as dbServices
@@ -75,3 +76,16 @@ def add_course():
     course_name = json.loads(request.data.decode('utf8'))['name']
     return dbServices.add_course(course_name)
     
+
+
+@app.route('/login',methods=['POST'])
+def login():
+    user_data = json.loads(request.data.decode('utf8'))
+
+    username = user_data['username']
+    password = user_data['password']
+
+    if(dbServices.user_exits(username,password)):
+        token = jwt.encode(user_data,username)
+        return jsonify({'token':token.decode()})
+
