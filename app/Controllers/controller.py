@@ -85,7 +85,10 @@ def login():
     username = user_data['username']
     password = user_data['password']
 
-    if(dbServices.user_exits(username,password)):
-        token = jwt.encode(user_data,username)
+    user = dbServices.get_user(username,password)
+    if(user):
+        token = jwt.encode(user,username)
         return jsonify({'token':token.decode()})
+    else:
+        return jsonify({"status":'404',"message":"user not found"})
 

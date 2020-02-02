@@ -73,5 +73,13 @@ class DatabaseServices():
 
 
     @staticmethod
-    def user_exits(username, password):
-        return True
+    def get_user(username, password):
+        user = {
+            "username": "username",
+            "role":"admin"
+        }
+        if(user):
+            return user
+        else:
+            return {}
+        
