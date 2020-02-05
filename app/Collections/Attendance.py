@@ -33,5 +33,5 @@ class Attendance:
                 "validationAction": "error"
             }))
         except errors.OperationFailure as FailureError:
-            print(FailureErro)
+            print(FailureError)
 

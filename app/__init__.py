@@ -4,24 +4,22 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app=app, support_credentials=True)
+
 
 client = MongoClient(host='localhost',port=27017)
 db = client.AttendenceSystem
 
 
-##Create Collections in Database
-
-##1) Create Courses Collection
+## Initialize Database
 from app.Services.DatabaseServices import DatabaseServices as dbServices
-
+print("Here")
 dbServices.initiate_database()
 
-##2) Create Attendance Collection
 
 
 
 
-CORS(app=app, support_credentials=True)
 
 
 from app.Controllers import controller
