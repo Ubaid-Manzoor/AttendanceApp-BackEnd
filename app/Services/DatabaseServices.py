@@ -85,6 +85,10 @@ class DatabaseServices():
         else:
             return {}
         
+    @staticmethod
+    def usernameExists(username):
+        users = db['users']
+        return users.find_one({"_id":username})
 
     @staticmethod
     def signup(user):
@@ -95,20 +99,35 @@ class DatabaseServices():
             "role": user['role']
         }
 
-        message = ""
-        status = 200
 
-        try:
-            users.insert_one(post)
-            message="User got successfully added!!"
-        except WriteError as werror:
-            message = werror
-            status = 400
-
-        return jsonify({
-            "message": message,
-            "status": status
-        })
+        if(DatabaseServices.usernameExists(user['username'])):
+            response = {
+                "status": 200,
+                "result": {
+                    "status": 409,
+                    "message": "username already exists!"
+                }
+            }
+        else:
+            try:
+                users.insert_one(post)
+                response = {
+                    "status": 200,
+                    "result" : {
+                        "status": 201,
+                        "message": "user created"
+                    }
+                }
+            except WriteError as werror:
+                response = {
+                    "status": 200,
+                    "result": {
+                        "status": 422,
+                        "message": "wrong input by user"
+                    }
+                }
+    
+        return jsonify(response)
 
 
     @staticmethod

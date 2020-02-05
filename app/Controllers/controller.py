@@ -83,10 +83,7 @@ def add_course():
 def signup():
     user_data = json.loads(request.data.decode('utf8'))
 
-    username = user_data['username']
-    password = user_data['password']
-
-    return dbServices.get_user(username,password)
+    return dbServices.signup(user_data)
 
 
 
