@@ -4,12 +4,12 @@ from collections import OrderedDict
 
 class Attendance:
 
-    @staticmethod:
+    @staticmethod
     def create():
         query = {
             "$jsonSchema": {
                 "bsonType": "object",
-                "required": ["attendance"]
+                "required": ["attendance"],
                 "properties":{
                     "_id":{
                         "bsonType": "string",

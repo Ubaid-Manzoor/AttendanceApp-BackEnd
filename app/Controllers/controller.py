@@ -50,12 +50,23 @@ def initiate_attendence():
     return "Done"
 
 
-    return f"{len(face_encodings)} Faces Found"
+    # return f"{len(face_encodings)} Faces Found"
 
 
 @app.route('/enroll_student_to_course',methods=['POST'])
 def enroll_student_to_course():
+    # # Structure of "data"
+    # data = {
+    #     "course_name": "",
+    #     "student_data": {
+    #         "name": "",
+    #         "roll_no": "",
+    #         "encoding": [] // For now generated Manually
+    #     }
+    # }
+    
     data = extract_json(request.data)
+    print(data)
     student_data  = data['student_data']
     student_data['encoding'] = generate_student_encoding()
 
@@ -74,6 +85,11 @@ def add_teacher():
 
 @app.route('/add_course',methods=['POST'])
 def add_course():
+    # Structur of "data"
+    # data = {
+    #     "name": ""
+    # }
+    
     course_name = json.loads(request.data.decode('utf8'))['name']
     return dbServices.add_course(course_name)
     

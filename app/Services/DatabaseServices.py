@@ -46,6 +46,7 @@ class DatabaseServices():
 
     @staticmethod
     def enroll_student(course_to_enroll,student_data):
+        
         courses = db['courses']
 
         ## Initializing Message and status for response
@@ -74,24 +75,24 @@ class DatabaseServices():
         pass
 
 
-    @staticmethod
-    def get_user(username, password):
-        user = {
-            "username": "username",
-            "role":"admin"
-        }
-        if(user):
-            return user
-        else:
-            return {}
+    # @staticmethod
+    # def get_user(username, password):
+    #     user = {
+    #         "username": "username",
+    #         "role":"admin"
+    #     }
+    #     if(user):
+    #         return user
+    #     else:
+    #         return {}
         
     @staticmethod
-    def usernameExists(username):
+    def usernameExists(username:str):
         users = db['users']
         return users.find_one({"_id":username})
 
     @staticmethod
-    def signup(user):
+    def signup(user:dict):
         users = db['users']
         post = {
             "_id": user['username'],
@@ -118,7 +119,7 @@ class DatabaseServices():
                         "message": "user created"
                     }
                 }
-            except WriteError as werror:
+            except WriteError:
                 response = {
                     "status": 200,
                     "result": {
@@ -131,7 +132,7 @@ class DatabaseServices():
 
 
     @staticmethod
-    def get_user(username,password):
+    def get_user(username:str,password:str):
         Users = db['users']
         
         return Users.find_one({"_id": username,"password":password})
@@ -143,7 +144,6 @@ class DatabaseServices():
         
         if(user):
             jwToken = jwt.encode(user,username).decode()
-            
             response = jsonify({
                 "status":200,
                 "result":{
