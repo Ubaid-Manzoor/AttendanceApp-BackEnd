@@ -1,4 +1,4 @@
-from flask import request,jsonify
+from flask import request,jsonify,make_response
 from app import app
 import face_recognition
 import pymongo
@@ -87,11 +87,13 @@ def add_teacher():
 def add_course():
     # Structur of "data"
     # data = {
-    #     "name": ""
+    #     "name": "",
+    #     "teacherAssigned"
     # }
-    
-    course_name = json.loads(request.data.decode('utf8'))['name']
-    return dbServices.add_course(course_name)
+    courseData = json.loads(request.data.decode('utf8'))
+    course_name = courseData['courseName']
+    teacherAssigned = courseData['teacherAssigned']
+    return dbServices.add_course(course_name,teacherAssigned)
     
 
 
@@ -111,3 +113,44 @@ def login():
     password = user_data['password']
 
     return dbServices.login(username,password)
+
+
+@app.route('/get_user',methods=['POST'])
+def get_user():
+    
+    username = json.loads(request.data.decode('utf8'))['username']
+    return dbServices.get_user(username)
+
+@app.route('/get_all_courses',methods=['POST'])
+def get_all_courses():
+    curser = dbServices.get_all_courses()
+    
+    allCourses = []
+    for course in curser:
+        dataToSend = {
+            "name":course['_id'],
+            "teacherAssigned":   course['teacherAssigned']
+        }
+        allCourses.append(dataToSend)
+    
+    response = make_response({
+        "allCourses":allCourses
+    })
+    
+    return response
+
+@app.route('/get_all_teachers',methods=['POST'])
+def get_all_teachers():
+    curser = dbServices.get_all_teachers()
+    
+    allTeachers = []
+    for teacher in curser:
+        dataToSend = {
+            "name": teacher['_id'],
+            "isConfirmed" : teacher['confirmed']
+        }
+        allTeachers.append(dataToSend)
+        
+    return make_response({
+        "allTeachers": allTeachers
+    })

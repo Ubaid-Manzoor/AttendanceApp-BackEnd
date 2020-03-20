@@ -3,7 +3,8 @@ from app import db
 from app.Collections.Courses import Courses 
 from app.Collections.Users import Users
 from pymongo.errors import WriteError
-from flask import jsonify
+from flask import jsonify, make_response, Response
+import datetime 
 import jwt
 
 class DatabaseServices():
@@ -20,6 +21,11 @@ class DatabaseServices():
     def get_all_students_enrolled(course_name:str):
         courses = db['courses']
         return courses.find_one({"_id":course_name})
+    
+    @staticmethod
+    def get_all_courses():
+        courses = db['courses']
+        return courses.find()
 
     @staticmethod
     def get_encodings(class_name):
@@ -27,23 +33,42 @@ class DatabaseServices():
 
 
     @staticmethod
-    def add_course(course_name:str):
+    def courseExists(courseName):
         courses = db['courses']
-        post = {"_id":course_name,"student_enrolled":[]}
+        return courses.find_one({"_id":courseName})
         
-        ## Initializing Message and status for response 
-        message = f"{course_name} course got created!!!"
-        status = 201
-        try:
-            courses.insert_one(post)
-        except WriteError as werror:
-            message = werror._message
-            status = 400
-        return jsonify({
-                "status": status,
-                "message": message
-        })
+    @staticmethod
+    def add_course(course_name:str,teacherAssigned:str):
+        courses = db['courses']
+        courseData = {
+                "_id":course_name,
+                "teacherAssigned":teacherAssigned,
+                "student_enrolled":[]
+            }
+        responseData = {
+            "status": 200,
+            "result": {}
+        }
+        
+        if(DatabaseServices.courseExists(courseData['_id'])):
+            responseData["result"] = {
+                        "status":409,
+                        "message": "course Already Exist"
+                    }
+        else:    
+            try:
+                courses.insert_one(courseData)
+                responseData["result"]={
+                            "status":201,
+                            "message": "Course Create"
+                        }
+            except WriteError as werror:
+                responseData["result"]={
+                            "status":400,
+                            "message": werror._message
+                        }
 
+        return make_response(responseData)
     @staticmethod
     def enroll_student(course_to_enroll,student_data):
         
@@ -74,17 +99,6 @@ class DatabaseServices():
     def mark_absent(student_roll):
         pass
 
-
-    # @staticmethod
-    # def get_user(username, password):
-    #     user = {
-    #         "username": "username",
-    #         "role":"admin"
-    #     }
-    #     if(user):
-    #         return user
-    #     else:
-    #         return {}
         
     @staticmethod
     def usernameExists(username:str):
@@ -94,10 +108,12 @@ class DatabaseServices():
     @staticmethod
     def signup(user:dict):
         users = db['users']
-        post = {
+        
+        userData = {
             "_id": user['username'],
             "password": user['password'],
-            "role": user['role']
+            "role": user['role'],
+            "confirmed": user['confirmed'] if user['confirmed'] else False
         }
 
 
@@ -111,7 +127,7 @@ class DatabaseServices():
             }
         else:
             try:
-                users.insert_one(post)
+                users.insert_one(userData)
                 response = {
                     "status": 200,
                     "result" : {
@@ -132,33 +148,60 @@ class DatabaseServices():
 
 
     @staticmethod
-    def get_user(username:str,password:str):
+    def check_user(username:str,password:str):
         Users = db['users']
         
         return Users.find_one({"_id": username,"password":password})
 
-
+    @staticmethod
+    def get_user(username:str):
+        Users = db['users']
+        
+        return Users.find_one({"_id":username})
+    
     @staticmethod
     def login(username,password):
-        user = DatabaseServices.get_user(username,password)
+        user = DatabaseServices.check_user(username,password)
         
-        if(user):
-            jwToken = jwt.encode(user,username).decode()
-            response = jsonify({
+        if(user['role'] != "admin" and (not user['confirmed'])):
+            responseData = {
+                "status": 200,
+                "result": {
+                    "status":403,
+                    "message": "Confirmation is Pending"
+                }
+            }
+            response = make_response(responseData)
+        elif(user):
+            # jwToken = jwt.encode(user,username).decode()
+            responseData = {
                 "status":200,
                 "result":{
-                    "jwt":jwToken,
+                    "data":{
+                        "username":username,
+                        "role":user['role']
+                        },
                     "status": 200,
-                    "message": "user does exist"
+                    "message": "User is Logged In"
                 }
-            })
+            }
+            response = make_response(responseData)
+            
+
         else:
-            response = jsonify({
+            responseData = {
                 "status": 200,
                 "result":{
                     "status": 401,
                     "message": "username or password is wrong"
                 }
-            })
-
+            }
+            response = make_response(responseData)
+            
         return response
+    
+    @staticmethod
+    def get_all_teachers():
+        users = db['users']
+        
+        return users.find({"role":"teacher"})
