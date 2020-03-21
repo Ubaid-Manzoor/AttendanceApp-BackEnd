@@ -77,10 +77,10 @@ def enroll_student_to_course():
     
 
 
-@app.route('/add_teacher',methods=['POST'])
-def add_teacher():
-    print(request.data)
-    return "Ubaid"
+# @app.route('/add_teacher',methods=['POST'])
+# def add_teacher():
+#     print(request.data)
+#     return "Ubaid"
 
 
 @app.route('/add_course',methods=['POST'])
@@ -94,6 +94,17 @@ def add_course():
     course_name = courseData['courseName']
     teacherAssigned = courseData['teacherAssigned']
     return dbServices.add_course(course_name,teacherAssigned)
+
+@app.route('/add_department', methods=['POST'])
+def add_department():
+    # Structure of Department
+    # data = [{
+    #   "name" : ""   
+    #}]
+    departmentData = json.loads(request.data.decode('utf8'))
+    departmentName = departmentData['departmentName']
+    
+    return dbServices.add_department(departmentName)
     
 
 
@@ -146,7 +157,8 @@ def get_all_teachers():
     allTeachers = []
     for teacher in curser:
         dataToSend = {
-            "name": teacher['_id'],
+            "username": teacher['_id'],
+            "name": teacher['name'],
             "confirmed" : teacher['confirmed']
         }
         allTeachers.append(dataToSend)
@@ -190,4 +202,3 @@ def update_sudent():
     whomToUpdate = updateData['whomToUpdate']
     
     return dbServices.update_student(whomToUpdate,whatToUpdate)
-    

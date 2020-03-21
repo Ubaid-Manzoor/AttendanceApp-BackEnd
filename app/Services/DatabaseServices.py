@@ -2,6 +2,7 @@
 from app import db
 from app.Collections.Courses import Courses 
 from app.Collections.Users import Users
+from app.Collections.Department import Department
 from pymongo.errors import WriteError
 from flask import jsonify, make_response, Response
 import datetime 
@@ -16,7 +17,10 @@ class DatabaseServices():
 
         ##Create Users Collection
         Users.create()
-
+        
+        ##Create Department Collection
+        Department.create()
+        
     @staticmethod
     def get_all_students_enrolled(course_name:str):
         courses = db['courses']
@@ -85,10 +89,34 @@ class DatabaseServices():
             message = werror._message 
             status = 400
         
-        return jsonify({
+        return jsonify({     
+
             "status": status,
             "message": message
         })
+        
+    @staticmethod
+    def add_department(departmentName):
+        department = db['department']
+        print({"name":departmentName})
+        try:
+            department.insert_one({"name":departmentName})
+            return make_response({
+                "status": 200,
+                "result": {
+                    "status": 201,
+                    "message": "department created"
+                }
+            })
+        except WriteError as werror:
+            return make_response({
+                "status": 200,
+                "result": {
+                    "status": 400,
+                    "message": werror._message
+                }
+            })
+            
 
 
     @staticmethod
@@ -111,6 +139,7 @@ class DatabaseServices():
         
         userData = {
             "_id": user['username'],
+            "name": user['name'],
             "password": user['password'],
             "role": user['role'],
             "confirmed": user['confirmed'] if user['confirmed'] else False
@@ -163,7 +192,7 @@ class DatabaseServices():
     def login(username,password):
         user = DatabaseServices.check_user(username,password)
         
-        if(user['role'] != "admin" and (not user['confirmed'])):
+        if(user and user['role'] != "admin" and (not user['confirmed'])):
             responseData = {
                 "status": 200,
                 "result": {
