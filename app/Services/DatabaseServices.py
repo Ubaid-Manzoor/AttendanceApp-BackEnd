@@ -205,3 +205,22 @@ class DatabaseServices():
         users = db['users']
         
         return users.find({"role":"teacher"})
+    
+    
+    @staticmethod
+    def update_teacher(teacherToUpdate,_toSet):
+        users = db['users']
+        
+        _filter = {
+            "_id": teacherToUpdate
+        } 
+        try:
+            users.update_one(_filter,{'$set': _toSet})
+            return make_response({
+                "status": 200
+            })
+        except: 
+            return make_response({
+                "status": 400
+            })
+            

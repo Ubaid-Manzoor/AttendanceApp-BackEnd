@@ -147,10 +147,20 @@ def get_all_teachers():
     for teacher in curser:
         dataToSend = {
             "name": teacher['_id'],
-            "isConfirmed" : teacher['confirmed']
+            "confirmed" : teacher['confirmed']
         }
         allTeachers.append(dataToSend)
         
     return make_response({
         "allTeachers": allTeachers
     })
+    
+@app.route('/update_teacher',methods=['POST'])
+def update_teacher():
+    updateData = json.loads(request.data.decode('utf8'))
+    print("updateData : ",updateData)
+    whatToUpdate = updateData['whatToUpdate']
+    whomToUpdate = updateData['whomToUpdate']
+    
+    return dbServices.update_teacher(whomToUpdate,whatToUpdate)
+    
