@@ -206,6 +206,11 @@ class DatabaseServices():
         
         return users.find({"role":"teacher"})
     
+    @staticmethod
+    def get_all_students():
+        users = db['users']
+        
+        return users.find({"role": "student"})
     
     @staticmethod
     def update_teacher(teacherToUpdate,_toSet):
@@ -220,6 +225,24 @@ class DatabaseServices():
                 "status": 200
             })
         except: 
+            return make_response({
+                "status": 400
+            })
+            
+    @staticmethod
+    def update_student(studentToUpdate, _toSet):
+        users = db['users']
+        
+        _filter = {
+            "_id": studentToUpdate
+        }
+        
+        try:
+            users.update_one(_filter,{'$set': _toSet})
+            return make_response({
+                "status":200
+            })
+        except:
             return make_response({
                 "status": 400
             })

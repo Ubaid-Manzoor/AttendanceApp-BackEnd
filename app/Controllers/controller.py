@@ -155,6 +155,24 @@ def get_all_teachers():
         "allTeachers": allTeachers
     })
     
+    
+@app.route('/get_all_students',methods=['POST'])
+def get_all_students():
+    curser = dbServices.get_all_students()
+    
+    allStudents = []
+    for student in curser:
+        dataToSend = {
+            "name" : student['_id'],
+            "confirmed": student['confirmed']
+        }
+        allStudents.append(dataToSend)
+        
+    return make_response({
+        "allStudents" : allStudents
+    })
+    
+    
 @app.route('/update_teacher',methods=['POST'])
 def update_teacher():
     updateData = json.loads(request.data.decode('utf8'))
@@ -163,4 +181,13 @@ def update_teacher():
     whomToUpdate = updateData['whomToUpdate']
     
     return dbServices.update_teacher(whomToUpdate,whatToUpdate)
+    
+
+@app.route('/update_student',methods=['POST'])
+def update_sudent():
+    updateData = json.loads(request.data.decode('utf8'))
+    whatToUpdate = updateData['whatToUpdate']
+    whomToUpdate = updateData['whomToUpdate']
+    
+    return dbServices.update_student(whomToUpdate,whatToUpdate)
     
