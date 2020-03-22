@@ -2,7 +2,7 @@
 from app import db
 from app.Collections.Courses import Courses 
 from app.Collections.Users import Users
-from app.Collections.Department import Department
+from app.Collections.Departments import Departments
 from pymongo.errors import WriteError
 from flask import jsonify, make_response, Response
 import datetime 
@@ -19,7 +19,7 @@ class DatabaseServices():
         Users.create()
         
         ##Create Department Collection
-        Department.create()
+        Departments.create()
         
     @staticmethod
     def get_all_students_enrolled(course_name:str):
@@ -37,16 +37,17 @@ class DatabaseServices():
 
 
     @staticmethod
-    def courseExists(courseName):
+    def courseExists(courseName,department):
         courses = db['courses']
-        return courses.find_one({"_id":courseName})
+        return courses.find_one({"name":courseName,"department":department})
         
     @staticmethod
-    def add_course(course_name:str,teacherAssigned:str):
+    def add_course(courseData):
         courses = db['courses']
         courseData = {
-                "_id":course_name,
-                "teacherAssigned":teacherAssigned,
+                "name":courseData['courseName'],
+                "teacherAssigned":courseData['teacherAssigned'],
+                "department": courseData['department'],
                 "student_enrolled":[]
             }
         responseData = {
@@ -54,7 +55,7 @@ class DatabaseServices():
             "result": {}
         }
         
-        if(DatabaseServices.courseExists(courseData['_id'])):
+        if(DatabaseServices.courseExists(courseData['name'],courseData['department'])):
             responseData["result"] = {
                         "status":409,
                         "message": "course Already Exist"
@@ -97,10 +98,10 @@ class DatabaseServices():
         
     @staticmethod
     def add_department(departmentName):
-        department = db['department']
+        departments = db['departments']
         print({"name":departmentName})
         try:
-            department.insert_one({"name":departmentName})
+            departments.insert_one({"name":departmentName})
             return make_response({
                 "status": 200,
                 "result": {
@@ -140,10 +141,13 @@ class DatabaseServices():
         userData = {
             "_id": user['username'],
             "name": user['name'],
+            "department": user['department'],
             "password": user['password'],
             "role": user['role'],
             "confirmed": user['confirmed'] if user['confirmed'] else False
         }
+        if(user['role'] == "student"):
+            userData['semester'] = user['semester']
 
 
         if(DatabaseServices.usernameExists(user['username'])):
@@ -240,6 +244,12 @@ class DatabaseServices():
         users = db['users']
         
         return users.find({"role": "student"})
+    
+    @staticmethod
+    def get_all_departments():
+        departments = db['departments']
+        
+        return departments.find({})
     
     @staticmethod
     def update_teacher(teacherToUpdate,_toSet):

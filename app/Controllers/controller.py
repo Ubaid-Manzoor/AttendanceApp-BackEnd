@@ -91,9 +91,9 @@ def add_course():
     #     "teacherAssigned"
     # }
     courseData = json.loads(request.data.decode('utf8'))
-    course_name = courseData['courseName']
-    teacherAssigned = courseData['teacherAssigned']
-    return dbServices.add_course(course_name,teacherAssigned)
+    # course_name = courseData['courseName']
+    # teacherAssigned = courseData['teacherAssigned']
+    return dbServices.add_course(courseData)
 
 @app.route('/add_department', methods=['POST'])
 def add_department():
@@ -139,8 +139,9 @@ def get_all_courses():
     allCourses = []
     for course in curser:
         dataToSend = {
-            "name":course['_id'],
-            "teacherAssigned":   course['teacherAssigned']
+            "name":course['name'],
+            "teacherAssigned":   course['teacherAssigned'],
+            "department": course['department']
         }
         allCourses.append(dataToSend)
     
@@ -159,6 +160,7 @@ def get_all_teachers():
         dataToSend = {
             "username": teacher['_id'],
             "name": teacher['name'],
+            "department": teacher['department'],
             "confirmed" : teacher['confirmed']
         }
         allTeachers.append(dataToSend)
@@ -175,7 +177,10 @@ def get_all_students():
     allStudents = []
     for student in curser:
         dataToSend = {
-            "name" : student['_id'],
+            "username" : student['_id'],
+            "name" : student['name'],
+            "department" : student['department'],
+            "semester" : student['semester'],
             "confirmed": student['confirmed']
         }
         allStudents.append(dataToSend)
@@ -184,6 +189,21 @@ def get_all_students():
         "allStudents" : allStudents
     })
     
+@app.route('/get_all_departments',methods=['POST'])
+def get_all_departments():
+    curser = dbServices.get_all_departments()
+    
+    allDepartments = []
+    for department in curser:
+        dataToSend = {
+            "name" : department['name']
+        }
+        
+        allDepartments.append(dataToSend)
+        
+    return make_response({
+        "allDepartments": allDepartments
+    })
     
 @app.route('/update_teacher',methods=['POST'])
 def update_teacher():

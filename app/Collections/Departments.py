@@ -3,7 +3,7 @@ from pymongo import errors
 from collections import OrderedDict 
 
 
-class Department:
+class Departments:
     
     @staticmethod 
     def create():
@@ -25,7 +25,7 @@ class Department:
         
         try:
             db.command(OrderedDict({
-                "create": "department",
+                "create": "departments",
                 "validator": query,
                 "validationLevel" : "strict",
                 "validationAction" : "error"

@@ -12,9 +12,17 @@ class Courses:
                 "bsonType": "object",
                 "required": ["student_enrolled"],
                 "properties":{
-                    "_id":{
+                    "name": {
                         "bsonType": "string",
-                        "description": "_id must be a string"
+                        "description": "course name must be a string"  
+                    },
+                    "teacherAssigned": {
+                        "bsonType": "string",
+                        "description": "teacher must be a string"
+                    },
+                    "department": {
+                        "bsonType": "string",
+                        "description": "department must be a string"
                     },
                     "student_enrolled":{
                         "bsonType": "array",
