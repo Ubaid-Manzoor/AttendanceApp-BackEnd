@@ -53,26 +53,7 @@ def initiate_attendence():
     # return f"{len(face_encodings)} Faces Found"
 
 
-@app.route('/enroll_student_to_course',methods=['POST'])
-def enroll_student_to_course():
-    # # Structure of "data"
-    # data = {
-    #     "course_name": "",
-    #     "student_data": {
-    #         "name": "",
-    #         "roll_no": "",
-    #         "encoding": [] // For now generated Manually
-    #     }
-    # }
-    
-    data = extract_json(request.data)
-    print(data)
-    student_data  = data['student_data']
-    student_data['encoding'] = generate_student_encoding()
 
-    course_name = data['course_name']
-    
-    return dbServices.enroll_student(course_name,student_data)
 
     
 
@@ -83,142 +64,9 @@ def enroll_student_to_course():
 #     return "Ubaid"
 
 
-@app.route('/add_course',methods=['POST'])
-def add_course():
-    # Structur of "data"
-    # data = {
-    #     "name": "",
-    #     "teacherAssigned"
-    # }
-    courseData = json.loads(request.data.decode('utf8'))
-    # course_name = courseData['courseName']
-    # teacherAssigned = courseData['teacherAssigned']
-    return dbServices.add_course(courseData)
-
-@app.route('/add_department', methods=['POST'])
-def add_department():
-    # Structure of Department
-    # data = [{
-    #   "name" : ""   
-    #}]
-    departmentData = json.loads(request.data.decode('utf8'))
-    departmentName = departmentData['departmentName']
-    
-    return dbServices.add_department(departmentName)
-    
-
-
-@app.route('/signup',methods=['POST'])
-def signup():
-    user_data = json.loads(request.data.decode('utf8'))
-
-    return dbServices.signup(user_data)
 
 
 
-@app.route('/login',methods=['POST'])
-def login():
-    user_data = json.loads(request.data.decode('utf8'))
-    
-    username = user_data['username']
-    password = user_data['password']
-
-    return dbServices.login(username,password)
-
-
-@app.route('/get_user',methods=['POST'])
-def get_user():
-    
-    username = json.loads(request.data.decode('utf8'))['username']
-    return dbServices.get_user(username)
-
-@app.route('/get_all_courses',methods=['POST'])
-def get_all_courses():
-    curser = dbServices.get_all_courses()
-    
-    allCourses = []
-    for course in curser:
-        dataToSend = {
-            "name":course['name'],
-            "teacherAssigned":   course['teacherAssigned'],
-            "department": course['department']
-        }
-        allCourses.append(dataToSend)
-    
-    response = make_response({
-        "allCourses":allCourses
-    })
-    
-    return response
-
-@app.route('/get_all_teachers',methods=['POST'])
-def get_all_teachers():
-    curser = dbServices.get_all_teachers()
-    
-    allTeachers = []
-    for teacher in curser:
-        dataToSend = {
-            "username": teacher['_id'],
-            "name": teacher['name'],
-            "department": teacher['department'],
-            "confirmed" : teacher['confirmed']
-        }
-        allTeachers.append(dataToSend)
-        
-    return make_response({
-        "allTeachers": allTeachers
-    })
-    
-    
-@app.route('/get_all_students',methods=['POST'])
-def get_all_students():
-    curser = dbServices.get_all_students()
-    
-    allStudents = []
-    for student in curser:
-        dataToSend = {
-            "username" : student['_id'],
-            "name" : student['name'],
-            "department" : student['department'],
-            "semester" : student['semester'],
-            "confirmed": student['confirmed']
-        }
-        allStudents.append(dataToSend)
-        
-    return make_response({
-        "allStudents" : allStudents
-    })
-    
-@app.route('/get_all_departments',methods=['POST'])
-def get_all_departments():
-    curser = dbServices.get_all_departments()
-    
-    allDepartments = []
-    for department in curser:
-        dataToSend = {
-            "name" : department['name']
-        }
-        
-        allDepartments.append(dataToSend)
-        
-    return make_response({
-        "allDepartments": allDepartments
-    })
-    
-@app.route('/update_teacher',methods=['POST'])
-def update_teacher():
-    updateData = json.loads(request.data.decode('utf8'))
-    print("updateData : ",updateData)
-    whatToUpdate = updateData['whatToUpdate']
-    whomToUpdate = updateData['whomToUpdate']
-    
-    return dbServices.update_teacher(whomToUpdate,whatToUpdate)
     
 
-@app.route('/update_student',methods=['POST'])
-def update_sudent():
-    updateData = json.loads(request.data.decode('utf8'))
-    whatToUpdate = updateData['whatToUpdate']
-    whomToUpdate = updateData['whomToUpdate']
-    
-    return dbServices.update_student(whomToUpdate,whatToUpdate)
+

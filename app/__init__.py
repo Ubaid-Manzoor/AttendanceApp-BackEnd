@@ -23,5 +23,8 @@ dbServices.initiate_database()
 
 
 from app.Controllers import controller
+from app.Controllers import courseController
+from app.Controllers import departmentController
+from app.Controllers import userController
 
 
