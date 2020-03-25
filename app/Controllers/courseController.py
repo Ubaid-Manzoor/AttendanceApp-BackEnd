@@ -33,12 +33,9 @@ def get_all_courses():
     
     allCourses = []
     for course in curser:
-        dataToSend = {
-            "name":course['name'],
-            "teacherAssigned":   course['teacherAssigned'],
-            "department": course['department']
-        }
-        allCourses.append(dataToSend)
+        del course['student_enrolled']
+        del course['_id']        
+        allCourses.append(course)
     
     response = make_response({
         "allCourses":allCourses

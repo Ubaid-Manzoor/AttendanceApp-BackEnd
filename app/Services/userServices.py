@@ -13,18 +13,19 @@ class userServices():
     def enroll_student(course_to_enroll,student_data):
         
         courses = db['courses']
-
+        print(student_data)
         ## Initializing Message and status for response
         # print({"_id":course_to_enroll},{"$push":{"student_enrolled":student_data}})
         message = ""
         status = 201
         try:
-            courses.update({"_id":course_to_enroll},{"$push":{"student_enrolled":student_data}})
+            courses.update({"name":course_to_enroll},{"$push":{"student_enrolled":student_data}})
             message = "Students Enrolled !"
+
         except WriteError as werror:
             message = werror._message 
             status = 400
-        
+        print(message)        
         return jsonify({     
 
             "status": status,
@@ -50,22 +51,27 @@ class userServices():
         return users.find_one({"_id":username})
 
     @staticmethod
-    def signup(user:dict):
+    def signup(userData:dict):
         users = db['users']
         
-        userData = {
-            "_id": user['username'],
-            "name": user['name'],
-            "department": user['department'],
-            "password": user['password'],
-            "role": user['role'],
-            "confirmed": user['confirmed'] if user['confirmed'] else False
-        }
-        if(user['role'] == "student"):
-            userData['semester'] = user['semester']
+        userData['_id'] = userData.pop('username')
+        userData.update({
+            "confirmed": userData['confirmed'] if userData['confirmed'] else False
+
+        })
+        # userData = {
+        #     "_id": user['username'],
+        #     "name": user['name'],
+        #     "department": user['department'],
+        #     "password": user['password'],
+        #     "role": user['role'],
+        #     "confirmed": user['confirmed'] if user['confirmed'] else False
+        # }
+        if(userData['role'] == "student"):
+            userData['semester'] = userData['semester']
 
 
-        if(userServices.usernameExists(user['username'])):
+        if(userServices.usernameExists(userData['_id'])):
             response = {
                 "status": 200,
                 "result": {
@@ -196,3 +202,5 @@ class userServices():
             return make_response({
                 "status": 400
             })
+            
+            

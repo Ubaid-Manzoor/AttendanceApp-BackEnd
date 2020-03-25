@@ -24,12 +24,11 @@ class courseServices():
     @staticmethod
     def add_course(courseData):
         courses = db['courses']
-        courseData = {
-                "name":courseData['courseName'],
-                "teacherAssigned":courseData['teacherAssigned'],
-                "department": courseData['department'],
-                "student_enrolled":[]
-            }
+
+        courseData.update({
+            "student_enrolled":[]
+        })
+        
         responseData = {
             "status": 200,
             "result": {}

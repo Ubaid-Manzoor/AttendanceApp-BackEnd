@@ -29,12 +29,8 @@ class Courses:
                         "description": "student_enrolled must be an array and is required",
                         "items":{
                             "bsonType": "object",
-                            "required": ["name","roll_no","encoding"],
+                            "required": ["roll_no","encoding"],
                             "properties":{
-                                "name": {
-                                    "bsonType": "string",
-                                    "description": "name must be a string and is required"
-                                },
                                 "roll_no": {
                                     "bsonType": "string",
                                     "description": "roll must be a string and is required"

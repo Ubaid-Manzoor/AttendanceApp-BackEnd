@@ -1,8 +1,13 @@
 from flask import request,jsonify,make_response
 from app import app
+import cv2
+from PIL import Image
+# from cv2 import cv
+import face_recognition
 # import face_recognition
 import pymongo
 import numpy as np
+import os
 import json
 import random
 # import jwt
@@ -37,6 +42,8 @@ def login():
 @app.route('/get_user',methods=['POST'])
 def get_user():
     
+    print(json.loads(request.data.decode('utf8')))
+    
     username = json.loads(request.data.decode('utf8'))['username']
     return userServices.get_user(username)
 
@@ -67,14 +74,15 @@ def get_all_students():
     
     allStudents = []
     for student in curser:
-        dataToSend = {
-            "username" : student['_id'],
-            "name" : student['name'],
-            "department" : student['department'],
-            "semester" : student['semester'],
-            "confirmed": student['confirmed']
-        }
-        allStudents.append(dataToSend)
+        student['username'] = student.pop('_id')
+        # dataToSend = {
+        #     "username" : student['_id'],
+        #     "name" : student['name'],
+        #     "department" : student['department'],
+        #     "semester" : student['semester'],
+        #     "confirmed": student['confirmed']
+        # }
+        allStudents.append(student)
         
     return make_response({
         "allStudents" : allStudents
@@ -99,3 +107,45 @@ def update_sudent():
     whomToUpdate = updateData['whomToUpdate']
     
     return userServices.update_student(whomToUpdate,whatToUpdate)
+
+app.config["IMAGE_UPLOAD_PATH"] = "/home/ubaid/Desktop/MyDrive/Projects/Attendance-App/backend/app/static/images"
+
+
+@app.route('/enroll_student',methods=['POST'])
+def enroll_student():
+    
+    ##########################################
+    ################ FROM DATA ###############
+    courseData = json.loads(request.form.get('courseData'))
+    student_roll = request.form.get('roll_no')
+    # print(image)
+    imagestr = request.files['file']
+    
+    path = os.path.join(app.config["IMAGE_UPLOAD_PATH"],student_roll)
+    imagestr.save(path)
+    
+    imageLoaded = cv2.imread(path)
+    
+    student_image_encoding = face_recognition.face_encodings(imageLoaded)[0];
+    print(type(student_image_encoding))
+
+    # print(student_image_encoding)
+    print(courseData)
+    for course,condition in courseData.items():
+        if condition:    
+            student_data = {
+                "roll_no": student_roll,
+                "encoding": list(student_image_encoding)
+            }
+            print(course)
+            userServices.enroll_student(course,student_data)
+    # print(request.form)
+    
+        
+    return {
+        "status": 200,
+        "result":{
+            "status": 201,
+            "message": "Fine"
+        }
+    }
