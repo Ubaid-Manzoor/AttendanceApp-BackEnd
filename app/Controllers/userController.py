@@ -122,15 +122,13 @@ def enroll_student():
     imagestr = request.files['file']
     
     path = os.path.join(app.config["IMAGE_UPLOAD_PATH"],student_roll)
-    imagestr.save(path)
     
+    imagestr.save(path)    
     imageLoaded = cv2.imread(path)
-    
-    student_image_encoding = face_recognition.face_encodings(imageLoaded)[0];
-    print(type(student_image_encoding))
 
-    # print(student_image_encoding)
-    print(courseData)
+    student_image_encoding = face_recognition.face_encodings(imageLoaded)[0]
+    
+    responseObjectArray = []
     for course,condition in courseData.items():
         if condition:    
             student_data = {
@@ -138,14 +136,10 @@ def enroll_student():
                 "encoding": list(student_image_encoding)
             }
             print(course)
-            userServices.enroll_student(course,student_data)
+            courseResponse = userServices.enroll_student(course,student_data)
+            
+            responseObjectArray.append(courseResponse)
     # print(request.form)
     
         
-    return {
-        "status": 200,
-        "result":{
-            "status": 201,
-            "message": "Fine"
-        }
-    }
+    return jsonify(responseObjectArray)

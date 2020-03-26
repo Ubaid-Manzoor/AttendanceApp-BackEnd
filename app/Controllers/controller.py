@@ -6,6 +6,8 @@ import numpy as np
 import json
 import random
 import jwt
+import cv2
+import os
 
 from app.helpers.data_helper import extract_json, generate_student_encoding, get_student_encoding, get_student_names 
 from app.helpers.image_helper import generate_image_encoding
@@ -19,10 +21,24 @@ def home():
 
 @app.route('/initiate_attendence',methods=['POST'])
 def initiate_attendence():
-    json_data = json.loads(request.data.decode('utf8'))
-    course_name = json_data['course_name']
+    
+    course_name = request.form.get('course')
+    # print(image)
+    imagestr = request.files['file']
+    print(imagestr)
+    print(course_name)
+    path = os.path.join(app.config["IMAGE_UPLOAD_PATH"],course_name)
+    
+    imagestr.save(path)    
+    imageLoaded = cv2.imread(path)
 
-    image_encodings = generate_image_encoding()#Will pass an Image in Future
+    class_image_encodings = face_recognition.face_encodings(imageLoaded)
+    
+    
+    # json_data = json.loads(request.data.decode('utf8'))
+    # course_name = json_data['course_name']
+
+    # image_encodings = generate_image_encoding()#Will pass an Image in Future
 
     ## Get Data of All Student in The course
     all_student_data = dbServices.get_all_students_enrolled(course_name)['student_enrolled']
@@ -30,10 +46,10 @@ def initiate_attendence():
     known_face_encodings = get_student_encoding(all_student_data)
     all_student_roll_nos = get_student_names(all_student_data)
 
-    print(np.array(known_face_encodings).shape)
-    print(all_student_roll_nos)
+    # print(np.array(known_face_encodings).shape)
+    # print(all_student_roll_nos)
 
-    for face_encoding in image_encodings:
+    for face_encoding in class_image_encodings:
         matches = face_recognition.compare_faces(known_face_encodings,face_encoding)
 
         face_distance = face_recognition.face_distance(known_face_encodings,face_encoding)
@@ -49,6 +65,9 @@ def initiate_attendence():
             print("mark_absent")
     return "Done"
 
+    return {
+        "status": 200
+    }
 
     # return f"{len(face_encodings)} Faces Found"
 

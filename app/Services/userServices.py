@@ -11,29 +11,47 @@ import jwt
 class userServices():
     @staticmethod
     def enroll_student(course_to_enroll,student_data):
-        
         courses = db['courses']
-        print(student_data)
-        ## Initializing Message and status for response
-        # print({"_id":course_to_enroll},{"$push":{"student_enrolled":student_data}})
-        message = ""
-        status = 201
+
+        response = {
+            "name": course_to_enroll,
+            "status": 200,
+            "result": {
+                
+            }
+        }
         try:
-            courses.update({"name":course_to_enroll},{"$push":{"student_enrolled":student_data}})
-            message = "Students Enrolled !"
+            roll_no = student_data.get('roll_no')
+            studentEnrolled =  \
+                courses.find_one({"name": course_to_enroll,
+                              "student_enrolled": {"$elemMatch":{"roll_no":roll_no} } 
+                            })
+            # print(studentEnrolled)
+            if(not studentEnrolled):
+                courses.update({"name":course_to_enroll},{"$push":{"student_enrolled":student_data}})
+                response.update({
+                    "result": {
+                        "status": 201,
+                        "message": "Student Enrolled!!!"
+                    }
+                })
+            else:
+                response.update({
+                    "result": {
+                        "status": 409,
+                        "message": "Already Enrolled"
+                    }
+                })
 
         except WriteError as werror:
-            message = werror._message 
-            status = 400
-        print(message)        
-        return jsonify({     
-
-            "status": status,
-            "message": message
-        })
-        
-    
+            response.update({
+                "result": {
+                    "status": 400,
+                    "message": werror._message
+                }
+            })
             
+        return response
 
 
     @staticmethod
