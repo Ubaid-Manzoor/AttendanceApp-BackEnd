@@ -24,6 +24,38 @@ class Courses:
                         "bsonType": "string",
                         "description": "department must be a string"
                     },
+                    "attendance": {
+                        "bsonType": "array",
+                        "description" : "attendance should me an array of objects",
+                        "items": {
+                            "bsonType": "object",
+                            "required": ["date","attendance_on_date"],
+                            "properties": {
+                                "date": {
+                                    "bsonType": "date",
+                                    "description": "date must be a date object"
+                                },
+                                "attedance_on_date":{
+                                    "bsonType": "array",
+                                    "description": "attendance_on_date should be a of attendances",
+                                    "items": {
+                                        "bsonType": "object",
+                                        "required": ["roll_no","status"],
+                                        "properties": {
+                                            "roll_no": {
+                                                "bsonType" : "string",
+                                                "description": "roll_no should be a string"
+                                            },
+                                            "status": {
+                                                "bsonType": "bool",
+                                                "description": "status should be a boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "student_enrolled":{
                         "bsonType": "array",
                         "description": "student_enrolled must be an array and is required",

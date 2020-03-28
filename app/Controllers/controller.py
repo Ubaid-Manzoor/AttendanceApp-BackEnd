@@ -9,9 +9,14 @@ import jwt
 import cv2
 import os
 
-from app.helpers.data_helper import extract_json, generate_student_encoding, get_student_encoding, get_student_names 
+from app.helpers.data_helper import extract_json, \
+                                    generate_student_encoding, \
+                                    get_student_encoding, \
+                                    get_student_rolls 
 from app.helpers.image_helper import generate_image_encoding
 from app.Services.DatabaseServices import DatabaseServices as dbServices
+
+from app.Services.courseServices import courseServices
 
 
 
@@ -22,54 +27,57 @@ def home():
 @app.route('/initiate_attendence',methods=['POST'])
 def initiate_attendence():
     
-    course_name = request.form.get('course')
+    courseData = json.loads(request.form.get('courseData'))
+    print("+++++++++++++++++")
+    print("+++++++++++++++++")
+    print("+++++++++++++++++")
+    print(courseData)
+    print("+++++++++++++++++")
+    print("+++++++++++++++++")
+    
     # print(image)
     imagestr = request.files['file']
     print(imagestr)
-    print(course_name)
-    path = os.path.join(app.config["IMAGE_UPLOAD_PATH"],course_name)
-    
-    imagestr.save(path)    
-    imageLoaded = cv2.imread(path)
+    print(courseData)
+    try: 
+        
+        path = os.path.join(app.config["IMAGE_UPLOAD_PATH"],courseData.get('name'))
+        
+        imagestr.save(path)    
+        imageLoaded = cv2.imread(path)
 
-    class_image_encodings = face_recognition.face_encodings(imageLoaded)
-    
-    
-    # json_data = json.loads(request.data.decode('utf8'))
-    # course_name = json_data['course_name']
+        class_image_encodings = face_recognition.face_encodings(imageLoaded)
+        
+        all_student_data = dbServices.get_all_students_enrolled(**courseData)
 
-    # image_encodings = generate_image_encoding()#Will pass an Image in Future
+        known_face_encodings = get_student_encoding(all_student_data)
+        all_student_roll_nos = get_student_rolls(all_student_data)
 
-    ## Get Data of All Student in The course
-    all_student_data = dbServices.get_all_students_enrolled(course_name)['student_enrolled']
+        courseServices.mark_all_absent(courseData)
 
-    known_face_encodings = get_student_encoding(all_student_data)
-    all_student_roll_nos = get_student_names(all_student_data)
+        for face_encoding,student_roll in zip(class_image_encodings,all_student_roll_nos):
+            matches = face_recognition.compare_faces(known_face_encodings,face_encoding)
+            face_distance = face_recognition.face_distance(known_face_encodings,face_encoding)
+            best_match_index = np.argmin(face_distance)
 
-    # print(np.array(known_face_encodings).shape)
-    # print(all_student_roll_nos)
+            if matches[best_match_index]:
+                courseServices.mark_present(student_roll,courseData)
+        return {
+            "status": 200,
+            "result": {
+                "status": 201,
+                "message": "Attendance Done"
+            }
+        }
+    except:
+        return {
+            "status": 200,
+            "result": {
+                "status": 400,
+                "message": "Some problem check your image"
+            }
+        }
 
-    for face_encoding in class_image_encodings:
-        matches = face_recognition.compare_faces(known_face_encodings,face_encoding)
-
-        face_distance = face_recognition.face_distance(known_face_encodings,face_encoding)
-
-        best_match_index = np.argmin(face_distance)
-
-        if matches[best_match_index]:
-            print(all_student_roll_nos[best_match_index])
-            print("mark_present")
-            # mark_present(all_student_roll_nos[best_match_index])
-        else:
-            # mark_absent(all_student_roll_nos[best_match_index])
-            print("mark_absent")
-    return "Done"
-
-    return {
-        "status": 200
-    }
-
-    # return f"{len(face_encodings)} Faces Found"
 
 
 

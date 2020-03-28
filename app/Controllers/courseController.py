@@ -6,7 +6,10 @@ import numpy as np
 import json
 import random
 # import jwt
-from app.helpers.data_helper import extract_json, generate_student_encoding, get_student_encoding, get_student_names 
+from app.helpers.data_helper import extract_json,\
+                                    generate_student_encoding, \
+                                    get_student_encoding
+                                    
 from app.helpers.image_helper import generate_image_encoding
 
 from app.Services.courseServices import  courseServices
@@ -29,12 +32,15 @@ def add_course():
 
 @app.route('/get_all_courses',methods=['POST'])
 def get_all_courses():
+    
+    filters = json.loads(request.data.decode('utf8'))
+    
     curser = courseServices.get_all_courses()
     
     allCourses = []
     for course in curser:
         del course['student_enrolled']
-        del course['_id']        
+        del course['_id']
         allCourses.append(course)
     
     response = make_response({

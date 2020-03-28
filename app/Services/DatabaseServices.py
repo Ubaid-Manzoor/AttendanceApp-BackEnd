@@ -22,9 +22,9 @@ class DatabaseServices():
         Departments.create()
         
     @staticmethod
-    def get_all_students_enrolled(course_name:str):
+    def get_all_students_enrolled(name:str, department:str, semester:int):
         courses = db['courses']
-        return courses.find_one({"_id":course_name})
+        return courses.find_one({"name":name,"department": department, "semester":semester})['student_enrolled']
     
     
 

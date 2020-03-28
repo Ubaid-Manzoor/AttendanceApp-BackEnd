@@ -18,8 +18,8 @@ def get_student_encoding(students_data:dict):
 
     return [student_data['encoding'] for student_data in students_data]
 
-def get_student_names(students_data:dict):
-    return [student_data['roll'] for student_data in students_data]
+def get_student_rolls(students_data:dict):
+    return [student_data['roll_no'] for student_data in students_data]
 
 def generate_student_encoding():
     return [random.uniform(1e-4,1e-1) for _ in range(128)]

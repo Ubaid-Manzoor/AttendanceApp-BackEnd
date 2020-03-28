@@ -11,7 +11,10 @@ import os
 import json
 import random
 # import jwt
-from app.helpers.data_helper import extract_json, generate_student_encoding, get_student_encoding, get_student_names 
+from app.helpers.data_helper import extract_json, \
+                                    generate_student_encoding, \
+                                    get_student_encoding
+                                     
 from app.helpers.image_helper import generate_image_encoding
 
 from app.Services.courseServices import  courseServices
