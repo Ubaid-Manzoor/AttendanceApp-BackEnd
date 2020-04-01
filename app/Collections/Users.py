@@ -50,4 +50,3 @@ class Users:
 
         except errors.OperationFailure as error:
             print(error)
-            print("User Collection  Creation Failure !!!")

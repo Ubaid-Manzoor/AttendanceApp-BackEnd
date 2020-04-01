@@ -3,7 +3,7 @@ from app.Collections.Courses import Courses
 from app.Collections.Users import Users
 from app.Collections.Departments import Departments
 from pymongo.errors import WriteError
-from flask import jsonify, make_response, Response
+from flask import jsonify, Response
 import datetime 
 import jwt
 
@@ -16,7 +16,7 @@ class departmentServices():
         print({"name":departmentName})
         try:
             departments.insert_one({"name":departmentName})
-            return make_response({
+            return jsonify({
                 "status": 200,
                 "result": {
                     "status": 201,
@@ -24,7 +24,7 @@ class departmentServices():
                 }
             })
         except WriteError as werror:
-            return make_response({
+            return jsonify({
                 "status": 200,
                 "result": {
                     "status": 400,

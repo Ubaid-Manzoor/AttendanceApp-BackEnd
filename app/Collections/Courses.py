@@ -86,6 +86,6 @@ class Courses:
             }))
             print("Collection Created!!!")
             
-        except errors.OperationFailure:
-            print("Collection Already Exists!!!")
+        except errors.OperationFailure as error:
+            print(error)
 

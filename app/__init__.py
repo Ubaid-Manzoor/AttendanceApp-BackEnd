@@ -10,21 +10,18 @@ CORS(app=app, support_credentials=True)
 client = MongoClient(host='localhost',port=27017)
 db = client.AttendenceSystem
 
+## INITIATING COLLECTIONS
+from app.Collections.Courses import Courses
+from app.Collections.Departments import Departments
+from app.Collections.Users import Users
+Courses.create()
+Departments.create()
+Users.create()
 
-## Initialize Database
-from app.Services.DatabaseServices import DatabaseServices as dbServices
-print("Here")
-dbServices.initiate_database()
-
-
-
-
-
-
-
-from app.Controllers import controller
 from app.Controllers import courseController
 from app.Controllers import departmentController
 from app.Controllers import userController
+from app.Controllers import studentController
+from app.Controllers import teacherController
 
 

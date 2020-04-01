@@ -1,11 +1,7 @@
 from app import db
-from app.Collections.Courses import Courses 
-from app.Collections.Users import Users
-from app.Collections.Departments import Departments
 from pymongo.errors import WriteError
-from flask import jsonify, make_response, Response
+from flask import jsonify
 import datetime  
-import jwt
 
 from app.helpers.data_helper import get_student_rolls
 
@@ -54,30 +50,20 @@ class courseServices():
                             "message": werror._message
                         }
 
-        return make_response(responseData)
+        return jsonify(responseData)
     
     
     @staticmethod
     def mark_present(student_roll,courseData):
-        print("present : ",student_roll)
-        print(courseData)
-        
         courses = db['courses']
-        
-        print("=======================")
-        print(datetime.datetime.utcnow().strftime("%Y-%m-%d"))
-        print("=======================")
-        
+
         doc = courses.find_one_and_update({**courseData,
-                        # "attendance.date":datetime.datetime.utcnow().strftime("%Y-%m-%d"),
-                        # "attendance.attendance_on_date.roll_no":student_roll
                         },
                         {"$set": { "attendance.$[ele].attendance_on_date.$[rollno]":{"roll_no": student_roll,"status":True} }},
                         array_filters= [{"ele.date":datetime.datetime.utcnow().strftime("%Y-%m-%d")}
                                           ,{"rollno.roll_no": student_roll}],
                         upsert=True
                        )
-        # print(doc)
         
     @staticmethod
     def mark_absent(student_roll,courseData):
@@ -90,7 +76,8 @@ class courseServices():
         
         if(not courses.find_one({**courseData
                              ,"attendance.date": datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        })):                        
+        })):
+            print("Not yet")                        
             student_enrolled = courses.find_one({**courseData})['student_enrolled']
             student_rolls = get_student_rolls(student_enrolled)
 

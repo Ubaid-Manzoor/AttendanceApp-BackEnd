@@ -3,64 +3,13 @@ from app.Collections.Courses import Courses
 from app.Collections.Users import Users
 from app.Collections.Departments import Departments
 from pymongo.errors import WriteError
-from flask import jsonify, make_response, Response
+from flask import jsonify, Response
 import datetime 
 import jwt
 
 
 class userServices():
-    @staticmethod
-    def enroll_student(course_to_enroll,student_data):
-        courses = db['courses']
-
-        response = {
-            "name": course_to_enroll,
-            "status": 200,
-            "result": {
-                
-            }
-        }
-        try:
-            roll_no = student_data.get('roll_no')
-            studentEnrolled =  \
-                courses.find_one({"name": course_to_enroll,
-                              "student_enrolled": {"$elemMatch":{"roll_no":roll_no} } 
-                            })
-            # print(studentEnrolled)
-            if(not studentEnrolled):
-                courses.update({"name":course_to_enroll},{"$push":{"student_enrolled":student_data}})
-                response.update({
-                    "result": {
-                        "status": 201,
-                        "message": "Student Enrolled!!!"
-                    }
-                })
-            else:
-                response.update({
-                    "result": {
-                        "status": 409,
-                        "message": "Already Enrolled"
-                    }
-                })
-
-        except WriteError as werror:
-            response.update({
-                "result": {
-                    "status": 400,
-                    "message": werror._message
-                }
-            })
-            
-        return response
-
-
-    @staticmethod
-    def mark_present(student_roll):
-        pass 
-
-    @staticmethod
-    def mark_absent(student_roll):
-        pass
+    
 
         
     @staticmethod
@@ -129,7 +78,7 @@ class userServices():
     def get_user(username:str):
         Users = db['users']
         
-        return Users.find_one({"_id":username})
+        return jsonify(Users.find_one({"_id":username}))
     
     @staticmethod
     def login(username,password):
@@ -143,7 +92,7 @@ class userServices():
                     "message": "Confirmation is Pending"
                 }
             }
-            response = make_response(responseData)
+            response = jsonify(responseData)
         elif(user):
             # jwToken = jwt.encode(user,username).decode()
             responseData = {
@@ -157,7 +106,7 @@ class userServices():
                     "message": "User is Logged In"
                 }
             }
-            response = make_response(responseData)
+            response = jsonify(responseData)
             
 
         else:
@@ -168,57 +117,18 @@ class userServices():
                     "message": "username or password is wrong"
                 }
             }
-            response = make_response(responseData)
+            response = jsonify(responseData)
             
         return response
     
-    @staticmethod
-    def get_all_teachers():
-        users = db['users']
-        
-        return users.find({"role":"teacher"})
-    
-    @staticmethod
-    def get_all_students():
-        users = db['users']
-        
-        return users.find({"role": "student"})
     
     
     
-    @staticmethod
-    def update_teacher(teacherToUpdate,_toSet):
-        users = db['users']
-        
-        _filter = {
-            "_id": teacherToUpdate
-        } 
-        try:
-            users.update_one(_filter,{'$set': _toSet})
-            return make_response({
-                "status": 200
-            })
-        except: 
-            return make_response({
-                "status": 400
-            })
+    
+    
+    
+    
             
-    @staticmethod
-    def update_student(studentToUpdate, _toSet):
-        users = db['users']
-        
-        _filter = {
-            "_id": studentToUpdate
-        }
-        
-        try:
-            users.update_one(_filter,{'$set': _toSet})
-            return make_response({
-                "status":200
-            })
-        except:
-            return make_response({
-                "status": 400
-            })
+    
             
             
