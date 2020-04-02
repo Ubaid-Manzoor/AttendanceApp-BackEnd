@@ -10,10 +10,15 @@ import jwt
 
 class teacherServices():
     @staticmethod
-    def get_all_teachers():
+    def get_all_teachers(filters, projection):
         users = db['users']
-        
-        return users.find({"role":"teacher"})
+        if filters is None:
+            return users.find({"role": "teacher"})
+        else:
+            filters.update({
+                "role": "teacher"
+            })
+            return users.find(filter=filters, projection=projection)
     
     @staticmethod
     def update_teacher(teacherToUpdate,_toSet):

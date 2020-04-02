@@ -9,10 +9,11 @@ from app.helpers.data_helper import get_student_rolls
 class courseServices():
     
     @staticmethod
-    def get_all_courses():
+    def get_all_courses(filters=None,projection=None):
+        # filters = None if filters
+        
         courses = db['courses']
-        return courses.find()
-    
+        return courses.find(filter=filters,projection=projection)
     
     @staticmethod
     def courseExists(courseName,department):

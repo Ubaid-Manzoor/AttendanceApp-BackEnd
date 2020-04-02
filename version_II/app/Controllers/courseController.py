@@ -69,14 +69,38 @@ def add_course():
 @app.route('/get_all_courses',methods=['POST'])
 def get_all_courses():
     
-    # filters = json.loads(request.data.decode('utf8'))
+    ## Called From (check for call of getAndSetCourses action in these js file which intern calls get_all_courses)
+    #1)AttendancePage/AttendancePage.js 
+    #2)ShowCoursePage/ShowCoursePage.js
+    #3)EnrollToCoursePage/EnrollToCoursePage.js
+
+    # print("******************************************")
+    # print("******************************************")
+    # print("******************************************")
+    # print("******************************************")
+    # print("******************************************")
+    # print("get_all_courses   CALLED")
+    # print("******************************************")
+    # print("******************************************")
+    # print("******************************************")
     
-    curser = courseServices.get_all_courses()
+    ## Loading the data request data
+    filters = json.loads(request.data.decode('utf8'))['filters']
+    projection = json.loads(request.data.decode('utf8'))['projection']
+    filters = None if not filters else filters 
+    projection = None if  not projection else projection
+    
+    print(type(filters))
+    print(filters)
+    print(projection)
+    
+    curser = courseServices.get_all_courses(filters,projection)
     
     allCourses = []
     for course in curser:
-        del course['student_enrolled']
-        del course['_id']
+        if not projection:
+            del course['student_enrolled']
+            del course['_id']
         allCourses.append(course)
     
     response = jsonify({
