@@ -16,11 +16,23 @@ from app.Services.studentServices import studentServices
 def initiate_attendence():
     
     courseData = json.loads(request.form.get('courseData'))
+
+    course = courseServices.getCourse(filter=courseData)
+    if(not course['student_enrolled']):
+        return jsonify({
+            "status": 200,
+            "result": {
+                "status": 401,
+                "message": "No Students Enrolled in the Course"
+            }
+        })
+
     imagestr = request.files['file']
+    
     try: 
-        IMAGE_UPLOAD_PATH = "/home/ubaid/Desktop/MyDrive/Projects/Attendance-App/backend/app/static/images"
+        IMAGE_UPLOAD_PATH = "/home/ubaid/Desktop/MyDrive/Projects/Attendance-App/backend/version_II/app/static/images"
         path = os.path.join(IMAGE_UPLOAD_PATH,courseData.get('name'))
-        
+        print("Path : ",path)
         imagestr.save(path)    
         imageLoaded = cv2.imread(path)
 
@@ -45,7 +57,8 @@ def initiate_attendence():
                 "message": "Attendance Done"
             }
         })
-    except:
+    except Exception as e:
+        print(e)
         return jsonify({
             "status": 200,
             "result": {

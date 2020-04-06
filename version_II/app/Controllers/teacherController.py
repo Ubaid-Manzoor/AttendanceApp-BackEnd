@@ -13,7 +13,16 @@ def get_all_teachers():
     filters = None if not filters else filters 
     projection = None if  not projection else projection
     
-    filters['_id'] = filters.pop('username')
+    print("*********************")
+    print("*********************")
+    print("*********************")
+    print("*********************")
+    print(filters)
+    
+    try:
+        filters['_id'] = filters.pop('username')
+    except:
+        pass
     
     curser = teacherServices.get_all_teachers(filters, projection)
     
@@ -25,7 +34,17 @@ def get_all_teachers():
         #     "department": teacher['department'],
         #     "confirmed" : teacher['confirmed']
         # }
+        teacher['username'] = teacher.pop('_id')
         allTeachers.append(teacher)
+    
+    print("*********************")
+    print("*********************")
+    print("*********************")
+    print("*********************")
+    print(allTeachers)
+    print("*********************")
+    print("*********************")
+    print("*********************")
         
     return jsonify({
         "allTeachers": allTeachers

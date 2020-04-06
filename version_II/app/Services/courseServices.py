@@ -16,6 +16,11 @@ class courseServices():
         return courses.find(filter=filters,projection=projection)
     
     @staticmethod
+    def getCourse(filter=None, projection=None):
+        courses = db['courses']
+        return courses.find_one(filter=filter)
+    
+    @staticmethod
     def courseExists(courseName,department):
         courses = db['courses']
         return courses.find_one({"name":courseName,"department":department})
@@ -58,12 +63,12 @@ class courseServices():
     def mark_present(student_roll,courseData):
         courses = db['courses']
 
-        doc = courses.find_one_and_update({**courseData,
+        courses.find_one_and_update({**courseData,
                         },
                         {"$set": { "attendance.$[ele].attendance_on_date.$[rollno]":{"roll_no": student_roll,"status":True} }},
                         array_filters= [{"ele.date":datetime.datetime.utcnow().strftime("%Y-%m-%d")}
                                           ,{"rollno.roll_no": student_roll}],
-                        upsert=True
+                        upsert=False
                        )
         
     @staticmethod
@@ -74,11 +79,15 @@ class courseServices():
     @staticmethod
     def mark_all_absent(courseData):
         courses = db['courses']
-        
-        if(not courses.find_one({**courseData
+        course  = courses.find_one({**courseData
                              ,"attendance.date": datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        })):
-            print("Not yet")                        
+        })
+        
+        
+        ## CHECK IF THERE IS NO STUDENT ENROLLED 
+        
+        
+        if(not course):
             student_enrolled = courses.find_one({**courseData})['student_enrolled']
             student_rolls = get_student_rolls(student_enrolled)
 
@@ -90,7 +99,6 @@ class courseServices():
                 }
                 
                 attendance_on_date.append(student_attendance)
-            
             courses.update({**courseData},{"$push": {"attendance": {
                     "date": datetime.datetime.utcnow().strftime("%Y-%m-%d") ,
                     "attendance_on_date": attendance_on_date

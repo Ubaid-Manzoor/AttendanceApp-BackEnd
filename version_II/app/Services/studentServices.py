@@ -54,10 +54,14 @@ class studentServices():
         return response
     
     @staticmethod
-    def get_all_students():
+    def get_all_students(filters, projection):
         users = db['users']
+        if filters:
+            filters.update({
+                "role": "student"
+            })
         
-        return users.find({"role": "student"})
+        return users.find(filters, projection)
     
     
     

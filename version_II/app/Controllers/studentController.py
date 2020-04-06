@@ -8,7 +8,17 @@ from app.Services.studentServices import studentServices
 
 @app.route('/get_all_students',methods=['POST'])
 def get_all_students():
-    curser = studentServices.get_all_students()
+    data = json.loads(request.data.decode('utf8'))
+    filters = data['filters']
+    projection = data['projection']
+    filters = None if not filters else filters 
+    projection = None if  not projection else projection
+    
+    try:
+        filters['_id'] = filters.pop('username')
+    except: pass    
+    
+    curser = studentServices.get_all_students(filters, projection)
     
     allStudents = []
     for student in curser:

@@ -16,6 +16,7 @@ def signup():
 def login():
     user_data = json.loads(request.data.decode('utf8'))
     
+    print(user_data)
     username = user_data['username']
     password = user_data['password']
 
