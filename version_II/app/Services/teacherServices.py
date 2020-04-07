@@ -13,7 +13,7 @@ class teacherServices():
     def get_all_teachers(filters, projection):
         users = db['users']
         if filters is None:
-            return users.find({"role": "teacher"})
+            return users.find({"role": "teacher"},projection)
         else:
             filters.update({
                 "role": "teacher"

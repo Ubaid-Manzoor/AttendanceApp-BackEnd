@@ -18,6 +18,7 @@ def get_all_teachers():
     print("*********************")
     print("*********************")
     print(filters)
+    print(projection)
     
     try:
         filters['_id'] = filters.pop('username')
@@ -28,13 +29,9 @@ def get_all_teachers():
     
     allTeachers = []
     for teacher in curser:
-        # dataToSend = {
-        #     "username": teacher['_id'],
-        #     "name": teacher['name'],
-        #     "department": teacher['department'],
-        #     "confirmed" : teacher['confirmed']
-        # }
-        teacher['username'] = teacher.pop('_id')
+        try:
+            teacher['username'] = teacher.pop('_id')
+        except: pass
         allTeachers.append(teacher)
     
     print("*********************")

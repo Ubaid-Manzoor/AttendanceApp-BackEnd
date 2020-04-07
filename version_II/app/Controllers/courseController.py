@@ -87,15 +87,6 @@ def get_all_courses():
     #2)ShowCoursePage/ShowCoursePage.js
     #3)EnrollToCoursePage/EnrollToCoursePage.js
 
-    # print("******************************************")
-    # print("******************************************")
-    # print("******************************************")
-    # print("******************************************")
-    # print("******************************************")
-    # print("get_all_courses   CALLED")
-    # print("******************************************")
-    # print("******************************************")
-    # print("******************************************")
     
     ## Loading the data request data
     filters = json.loads(request.data.decode('utf8'))['filters']
@@ -113,7 +104,7 @@ def get_all_courses():
     for course in curser:
         if not projection:
             del course['student_enrolled']
-            del course['_id']
+        del course['_id']
         allCourses.append(course)
     
     response = jsonify({
