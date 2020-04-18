@@ -10,6 +10,7 @@ from app.helpers.data_helper import get_student_encoding,get_student_rolls
 
 from app.Services.courseServices import  courseServices
 from app.Services.studentServices import studentServices
+from app.Services.userServices import userServices
 
 
 @app.route('/initiate_attendence',methods=['POST'])
@@ -41,7 +42,8 @@ def initiate_attendence():
         known_face_encodings = get_student_encoding(all_student_data)
         all_student_roll_nos = get_student_rolls(all_student_data)
 
-        courseServices.mark_all_absent(courseData)
+        
+        courseServices.mark_all_absent(courseData) ############ SOME ERROR
 
         for face_encoding,student_roll in zip(class_image_encodings,all_student_roll_nos):
             matches = face_recognition.compare_faces(known_face_encodings,face_encoding)
@@ -74,8 +76,13 @@ def add_course():
     # data = {
     #     "name": "",
     #     "teacherAssigned"
-    # }
     courseData = json.loads(request.data.decode('utf8'))
+    
+    filter = {
+        "name": courseData['teacherAssigned'],
+        "department": courseData['department']
+    }
+    userServices.updateCourseInfoOfUser(courseData['name'],filter,"teacher")
     return courseServices.add_course(courseData)
 
 

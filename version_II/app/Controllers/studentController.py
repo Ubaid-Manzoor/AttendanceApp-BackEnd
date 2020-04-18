@@ -5,6 +5,7 @@ import cv2
 import face_recognition
 from flask import jsonify, request
 from app.Services.studentServices import studentServices
+from app.Services.userServices import userServices
 
 @app.route('/get_all_students',methods=['POST'])
 def get_all_students():
@@ -73,5 +74,6 @@ def enroll_student():
                 "encoding": list(student_image_encoding)
             }
             courseResponse = studentServices.enroll_student(course,student_data)
+            userServices.updateCourseInfoOfUser(course,{"roll_no": student_roll},'student')
             responseObjectArray.append(courseResponse)
     return jsonify(responseObjectArray)

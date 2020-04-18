@@ -38,7 +38,8 @@ class courseServices():
             "result": {}
         }
         
-        if(courseServices.courseExists(courseData['name'],courseData['department'])):
+        
+        if(courses.find_one({"name":courseData['name'],"department":courseData['department']})):
             responseData["result"] = {
                         "status":409,
                         "message": "course Already Exist"
@@ -86,9 +87,9 @@ class courseServices():
         
         ## CHECK IF THERE IS NO STUDENT ENROLLED 
         
-        
         if(not course):
             student_enrolled = courses.find_one({**courseData})['student_enrolled']
+            print("++++++")
             student_rolls = get_student_rolls(student_enrolled)
 
             attendance_on_date = []
@@ -99,6 +100,7 @@ class courseServices():
                 }
                 
                 attendance_on_date.append(student_attendance)
+
             courses.update({**courseData},{"$push": {"attendance": {
                     "date": datetime.datetime.utcnow().strftime("%Y-%m-%d") ,
                     "attendance_on_date": attendance_on_date

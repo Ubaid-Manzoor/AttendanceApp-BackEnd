@@ -32,8 +32,8 @@ class Courses:
                             "required": ["date","attendance_on_date"],
                             "properties": {
                                 "date": {
-                                    "bsonType": "date",
-                                    "description": "date must be a date object"
+                                    "bsonType": "string",
+                                    "description": "date must be a string object"
                                 },
                                 "attedance_on_date":{
                                     "bsonType": "array",
@@ -84,7 +84,7 @@ class Courses:
                 "validationLevel": "strict",
                 "validationAction": "error"
             }))
-            print("Collection Created!!!")
+            print("Course Collection Created!!!")
             
         except errors.OperationFailure as error:
             print(error)

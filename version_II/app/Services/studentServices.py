@@ -56,7 +56,12 @@ class studentServices():
     @staticmethod
     def get_all_students(filters, projection):
         users = db['users']
-        if filters:
+        if not filters:
+            filters = ({
+                "role": "student"
+            })
+            
+        else:
             filters.update({
                 "role": "student"
             })

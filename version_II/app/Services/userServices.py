@@ -121,6 +121,15 @@ class userServices():
             
         return response
     
+    @staticmethod
+    def updateCourseInfoOfUser(course, filter, role):
+        Users = db['users']
+        if role == "student":
+            Users.update_one( {**filter}, {"$push": {"courseEnrolled": course} } )
+        elif role == "teacher":
+            Users.update_one({**filter}, {"$push": {"courseAssigned": course}} )
+        
+        
     
     
     

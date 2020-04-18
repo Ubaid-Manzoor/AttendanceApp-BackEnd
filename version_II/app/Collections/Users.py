@@ -9,7 +9,7 @@ class Users:
         query = {
             "$jsonSchema": {
                 "bsonType": "object",
-                "required": ['password','role','confirmed'],
+                "required": ['name','password','role'],
                 "properties": {
                     "_id": {
                         "bsonType": "string",
@@ -21,7 +21,7 @@ class Users:
                     },
                     "department": {
                         "bsonType": "string",
-                        "descripion": "must be a string"
+                        "description": "must be a string"
                     },
                     "password":{
                         "bsonType": "string",

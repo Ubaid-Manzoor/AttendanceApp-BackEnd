@@ -11,27 +11,40 @@ import jwt
 class departmentServices():
     
     @staticmethod
-    def add_department(departmentName):
+    def add_department(name):
         departments = db['departments']
-        print({"name":departmentName})
-        try:
-            departments.insert_one({"name":departmentName})
+        print({"name":name})
+        
+        filter = {
+            "name": name
+        }
+        if(not departments.find_one(filter)):
+            try:
+                departments.insert_one({"name":name})
+                return jsonify({
+                    "status": 200,
+                    "result": {
+                        "status": 201,
+                        "message": "department created"
+                    }
+                })
+            except WriteError as werror:
+                return jsonify({
+                    "status": 200,
+                    "result": {
+                        "status": 400,
+                        "message": werror._message
+                    }
+                })
+        else:
             return jsonify({
                 "status": 200,
                 "result": {
-                    "status": 201,
-                    "message": "department created"
+                    "status": 409,
+                    "message": "Department Already Exists"
                 }
             })
-        except WriteError as werror:
-            return jsonify({
-                "status": 200,
-                "result": {
-                    "status": 400,
-                    "message": werror._message
-                }
-            })
-            
+                
     
     @staticmethod
     def get_all_departments():

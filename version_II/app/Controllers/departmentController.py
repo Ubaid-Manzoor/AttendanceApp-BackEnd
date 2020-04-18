@@ -30,6 +30,6 @@ def add_department():
     #   "name" : ""   
     #}]
     departmentData = json.loads(request.data.decode('utf8'))
-    departmentName = departmentData['departmentName']
+    name = departmentData['name']
     
-    return departmentServices.add_department(departmentName)
+    return departmentServices.add_department(name)
