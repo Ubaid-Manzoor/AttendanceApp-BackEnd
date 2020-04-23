@@ -101,10 +101,6 @@ def get_all_courses():
     filters = None if not filters else filters 
     projection = None if  not projection else projection
     
-    print(type(filters))
-    print(filters)
-    print(projection)
-    
     curser = courseServices.get_all_courses(filters,projection)
     
     allCourses = []
@@ -120,5 +116,46 @@ def get_all_courses():
     
     return response
 
+@app.route('/getAttendance',methods=['POST'])
+def getAttendance():
+    
+    data = json.loads(request.data.decode('utf8'))
+    print(data)
+    
+    if(data['role'] == 'student'):
+        filters = {
+            "name": data['course'],
+            "department": data['department'],
+            "semester": data['semester']
+        }
+        others = {
+            "month": data['month'],
+            "all_or_one": data['all_or_one'],
+            "roll_no": data['roll_no'] if data['roll_no'] else None,
+            "role": data['role']
+        }
+        pass
+    else:
+        pass
+    
+    try:
+        attendance = courseServices.getAttendance(filters, others)
+        return jsonify({
+            "status": 200,
+            "result": {
+                "status": 200,
+                "message": "Fetched",
+                "data": attendance
+            }
+        })
+    except:
+        return jsonify({
+            "status": 200,
+            "result": {
+                "status": 400,
+                "message": "Some Problem while fetching..."  
+            }
+        })
+    
 
-
+    

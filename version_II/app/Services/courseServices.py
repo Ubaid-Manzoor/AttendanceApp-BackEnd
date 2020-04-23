@@ -106,3 +106,55 @@ class courseServices():
                     "attendance_on_date": attendance_on_date
                 }}})
         
+        
+    @staticmethod
+    def checkStatus(attendance_array,roll_no):
+        for attendance in attendance_array:
+            if attendance['roll_no'] == roll_no:
+                return attendance['status']         
+        return False
+    @staticmethod
+    def getAttendance(filters,others):
+        courses = db['courses']
+        month = others['month']
+        all_or_one = others['all_or_one']
+        roll_no = others['roll_no'] ## Will ne None if all_or_one = "all"
+        
+        course = courses.find_one({**filters})
+        
+        attendances = course['attendance']
+        student_enrolled = sorted([student['roll_no'] for student in course['student_enrolled']])
+        
+        attendance_of_month = {}
+        for attendance in attendances:
+            ## First Check for the Date
+            date = attendance['date']
+            ## ONLY ADD THE ATTENDCE FOR REQUIRED MONTH
+            
+            if int(date.split('-')[1]) == int(month) + 1: ## CHECKING FOR THE MONTH
+                current_day_attendance = attendance['attendance_on_date']
+                
+                ### If attendance of Just One Student is Requested
+                if all_or_one == "one":
+                    day = int(date.split('-')[2])
+                    present = courseServices.checkStatus(current_day_attendance,roll_no)
+                    
+                    ### If we have to add Student attence for the first time
+                    ### then enter IF otherwise ELSE
+                    if not attendance_of_month.get(roll_no):
+                        attendance_of_month[roll_no] = [{"day": day,"present": present}]
+                    else:
+                        attendance_of_month.get(roll_no).append({"day": day,"present": present})
+                ### If attendance of Just All Students is Requested
+                else:
+                    for roll_no in student_enrolled:
+                        if not attendance_of_month.get(roll_no):
+                            attendance_of_month[roll_no] = {"totalClassesAttended": 0, "totalClasses":0}
+                        else:
+                            attendance_of_month[roll_no] =  {
+                                                                "totalClassesAttended": attendance_of_month[roll_no]['totalClassesAttended'] \
+                                                                                            + courseServices.checkStatus(current_day_attendance,roll_no)
+                                                               ,"totalClasses": attendance_of_month[roll_no]['totalClasses'] + 1
+                                                            }
+
+        return attendance_of_month
