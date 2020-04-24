@@ -114,15 +114,14 @@ class courseServices():
                 return attendance['status']         
         return False
     @staticmethod
-    def getAttendance(filters,others):
+    def getAttendance(filters,others):        
         courses = db['courses']
         month = others['month']
         all_or_one = others['all_or_one']
-        roll_no = others['roll_no'] ## Will ne None if all_or_one = "all"
         
         course = courses.find_one({**filters})
         
-        attendances = course['attendance']
+        attendances = course.get('attendance')
         student_enrolled = sorted([student['roll_no'] for student in course['student_enrolled']])
         
         attendance_of_month = {}
@@ -133,10 +132,12 @@ class courseServices():
             
             if int(date.split('-')[1]) == int(month) + 1: ## CHECKING FOR THE MONTH
                 current_day_attendance = attendance['attendance_on_date']
-                
+                print(current_day_attendance)
                 ### If attendance of Just One Student is Requested
                 if all_or_one == "one":
                     day = int(date.split('-')[2])
+                    roll_no = others['roll_no'] ## Will ne None if all_or_one = "all"
+                    
                     present = courseServices.checkStatus(current_day_attendance,roll_no)
                     
                     ### If we have to add Student attence for the first time
@@ -156,5 +157,5 @@ class courseServices():
                                                                                             + courseServices.checkStatus(current_day_attendance,roll_no)
                                                                ,"totalClasses": attendance_of_month[roll_no]['totalClasses'] + 1
                                                             }
-
+                            
         return attendance_of_month

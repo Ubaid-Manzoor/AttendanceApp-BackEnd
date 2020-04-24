@@ -37,7 +37,7 @@ def initiate_attendence():
         imagestr.save(path)    
         imageLoaded = cv2.imread(path)
 
-        class_image_encodings = face_recognition.face_encodings(imageLoaded)
+        class_image_encodings = face_recognition.face_encodings(imageLoaded, model="cnn")
         all_student_data = studentServices.get_all_students_enrolled(**courseData)
         known_face_encodings = get_student_encoding(all_student_data)
         all_student_roll_nos = get_student_rolls(all_student_data)
@@ -134,9 +134,17 @@ def getAttendance():
             "roll_no": data['roll_no'] if data['roll_no'] else None,
             "role": data['role']
         }
-        pass
     else:
-        pass
+        filters = {
+            "name": data['course'],
+            "department": data['department'],
+            "teacherAssigned": data['teacherAssigned']
+        }
+        others = {
+            "month": data['month'],
+            "all_or_one": data['all_or_one'],
+            "role": data['role']
+        }
     
     try:
         attendance = courseServices.getAttendance(filters, others)
@@ -153,7 +161,8 @@ def getAttendance():
             "status": 200,
             "result": {
                 "status": 400,
-                "message": "Some Problem while fetching..."  
+                "message": "Some Problem while fetching...",
+                "data": []
             }
         })
     
